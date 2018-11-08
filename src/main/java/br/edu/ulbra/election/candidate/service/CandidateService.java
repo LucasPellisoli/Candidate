@@ -4,7 +4,9 @@ import br.edu.ulbra.election.candidate.exception.GenericOutputException;
 import br.edu.ulbra.election.candidate.input.v1.CandidateInput;
 import br.edu.ulbra.election.candidate.model.Candidate;
 import br.edu.ulbra.election.candidate.output.v1.CandidateOutput;
+import br.edu.ulbra.election.candidate.output.v1.ElectionOutput;
 import br.edu.ulbra.election.candidate.output.v1.GenericOutput;
+import br.edu.ulbra.election.candidate.output.v1.PartyOutput;
 import br.edu.ulbra.election.candidate.repository.CandidateRepository;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,8 +36,13 @@ public class CandidateService {
     }
 
     public List<CandidateOutput> getAll(){
-        Type candidateOutputListType = new TypeToken<List<CandidateOutput>>(){}.getType();
-        return modelMapper.map(candidateRepository.findAll(), candidateOutputListType);
+        List<Candidate> candidateList = (List<Candidate>) candidateRepository.findAll();
+        List<CandidateOutput> candidateOutputList = new ArrayList<>();
+        for(Candidate candidate : candidateList){
+            candidateOutputList.add(this.mapCanditade(candidate));
+        }
+
+        return candidateOutputList;
     }
 
     public CandidateOutput getById(Long candidateId){
@@ -53,7 +61,8 @@ public class CandidateService {
         this.validateInput(candidateInput);
         Candidate candidate = modelMapper.map(candidateInput, Candidate.class);
         candidate = candidateRepository.save(candidate);
-        return modelMapper.map(candidate, CandidateOutput.class);
+
+        return this.mapCanditade(candidate);
     }
 
     public CandidateOutput update(Long candidateId, CandidateInput candidateInput){
@@ -63,13 +72,13 @@ public class CandidateService {
         validateInput(candidateInput);
         Candidate candidate = modelMapper.map(this.getById(candidateId), Candidate.class);
 
+        candidate.setName(candidateInput.getName());
         candidate.setPartyId(candidateInput.getPartyId());
         candidate.setName(candidateInput.getName());
         candidate.setNumberElection(candidateInput.getNumberElection());
         candidate.setElectionId(candidateInput.getElectionId());
 
-        candidate = candidateRepository.save(candidate);
-        return modelMapper.map(candidate, CandidateOutput.class);
+        return mapCanditade(candidate);
     }
 
     public GenericOutput delete(Long voterId) {
@@ -86,6 +95,24 @@ public class CandidateService {
 
         return new GenericOutput("Candidate deleted");
     }
+
+    private CandidateOutput mapCanditade(Candidate candidate){
+        CandidateOutput candidateOutput = modelMapper.map(candidate,CandidateOutput.class);
+
+        ElectionOutput electionOutput = new ElectionOutput();
+        electionOutput.setId(candidate.getElectionId());
+
+        candidateOutput.setElectionOutput(electionOutput);
+
+        PartyOutput partyOutput = new PartyOutput();
+        partyOutput.setId(candidate.getPartyId());
+
+        candidateOutput.setPartyOutput(partyOutput);
+
+        return candidateOutput;
+    }
+
+
     private void validateInput(CandidateInput candidateInput){
 
         if(StringUtils.isBlank(candidateInput.getName())){
@@ -100,7 +127,18 @@ public class CandidateService {
         if(candidateInput.getPartyId() == null){
             throw new GenericOutputException("Party id is required");
         }
+        if(candidateInput.getName().indexOf(" ") == -1){
+            throw new GenericOutputException("error");
+        }
 
+        if(candidateInput.getName().length() < 5){
+            throw new GenericOutputException("error");
+        }
     }
+//
+//    private void valideNewInput(CandidateInput candidateInput){
+//        PartyOutput party = new PartyOutput();
+//    }
+
 }
 

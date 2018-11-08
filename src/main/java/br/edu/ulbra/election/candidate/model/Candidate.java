@@ -15,7 +15,7 @@ public class Candidate {
     @Column
     private Long partyId;
 
-    @Column
+    @Column(name="number")
     private Long numberElection;
 
     @Column
