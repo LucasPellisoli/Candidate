@@ -9,17 +9,17 @@ public class Candidate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String name;
 
-    @Column(nullable = false)
+    @Column
+    private Long partyId;
+
+    @Column(name="number")
     private Long numberElection;
 
-    @Column(nullable = false)
+    @Column
     private Long electionId;
-
-    @Column(nullable = false)
-    private Long partyId;
 
     public Long getId() {
         return id;
@@ -37,6 +37,14 @@ public class Candidate {
         this.name = name;
     }
 
+    public Long getPartyId() {
+        return partyId;
+    }
+
+    public void setPartyId(Long partyId) {
+        this.partyId = partyId;
+    }
+
     public Long getNumberElection() {
         return numberElection;
     }
@@ -52,13 +60,4 @@ public class Candidate {
     public void setElectionId(Long electionId) {
         this.electionId = electionId;
     }
-
-    public Long getPartyId() {
-        return partyId;
-    }
-
-    public void setPartyId(Long partyId) {
-        this.partyId = partyId;
-    }
-
 }
