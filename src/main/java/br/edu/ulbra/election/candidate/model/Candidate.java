@@ -9,16 +9,16 @@ public class Candidate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private Long partyId;
 
-    @Column(name="number")
+    @Column(name="number",nullable = false)
     private Long numberElection;
 
-    @Column
+    @Column(nullable = false)
     private Long electionId;
 
     public Long getId() {

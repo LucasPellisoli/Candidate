@@ -1,5 +1,7 @@
 package br.edu.ulbra.election.candidate.service;
 
+import br.edu.ulbra.election.candidate.client.ElectionClientService;
+import br.edu.ulbra.election.candidate.client.PartyClientService;
 import br.edu.ulbra.election.candidate.exception.GenericOutputException;
 import br.edu.ulbra.election.candidate.input.v1.CandidateInput;
 import br.edu.ulbra.election.candidate.model.Candidate;
@@ -24,15 +26,17 @@ public class CandidateService {
 
     private final CandidateRepository candidateRepository;
     private final ModelMapper modelMapper;
-
-
+    private final ElectionClientService electionClientService;
+    private final PartyClientService partyClientService;
     private static final String MESSAGE_INVALID_ID = "Invalid id";
     private static final String MESSAGE_VOTER_NOT_FOUND = "Voter not found";
 
     @Autowired
-    public CandidateService(CandidateRepository candidateRepository, ModelMapper modelMapper) {
+    public CandidateService(CandidateRepository candidateRepository, ModelMapper modelMapper, ElectionClientService electionClientService, PartyClientService partyClientService) {
         this.candidateRepository = candidateRepository;
         this.modelMapper = modelMapper;
+        this.electionClientService = electionClientService;
+        this.partyClientService = partyClientService;
     }
 
     public List<CandidateOutput> getAll(){
@@ -99,40 +103,47 @@ public class CandidateService {
     private CandidateOutput mapCanditade(Candidate candidate){
         CandidateOutput candidateOutput = modelMapper.map(candidate,CandidateOutput.class);
 
-        ElectionOutput electionOutput = new ElectionOutput();
-        electionOutput.setId(candidate.getElectionId());
-
+        ElectionOutput electionOutput = electionClientService.getById(candidate.getElectionId());
         candidateOutput.setElectionOutput(electionOutput);
 
-        PartyOutput partyOutput = new PartyOutput();
-        partyOutput.setId(candidate.getPartyId());
-
+        PartyOutput partyOutput = partyClientService.getById(candidate.getPartyId());
         candidateOutput.setPartyOutput(partyOutput);
 
         return candidateOutput;
     }
 
 
-    private void validateInput(CandidateInput candidateInput){
+    private void validateInput(CandidateInput candidateInput) {
 
-        if(StringUtils.isBlank(candidateInput.getName())){
+        if (StringUtils.isBlank(candidateInput.getName())) {
             throw new GenericOutputException("Name is required");
         }
-        if(candidateInput.getElectionId() == null){
+        if (candidateInput.getElectionId() == null) {
             throw new GenericOutputException("Election id is required");
         }
-        if(candidateInput.getNumberElection() == null){
+        if (candidateInput.getNumberElection() == null) {
             throw new GenericOutputException("Number election is required");
         }
-        if(candidateInput.getPartyId() == null){
+        if (candidateInput.getPartyId() == null) {
             throw new GenericOutputException("Party id is required");
         }
-        if(candidateInput.getName().indexOf(" ") == -1){
+        if (candidateInput.getName().indexOf(" ") == -1) {
             throw new GenericOutputException("error");
         }
 
-        if(candidateInput.getName().length() < 5){
+        if (candidateInput.getName().length() < 5) {
             throw new GenericOutputException("error");
+        }
+
+        ElectionOutput electionOutput = electionClientService.getById(candidateInput.getElectionId());
+        PartyOutput partyOutput = partyClientService.getById(candidateInput.getPartyId());
+
+        if (electionOutput == null) {
+            throw new GenericOutputException("error Election");
+        }
+
+        if (partyOutput == null) {
+            throw new GenericOutputException("error Party");
         }
     }
 //
