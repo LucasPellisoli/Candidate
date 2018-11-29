@@ -36,4 +36,7 @@ info:
 
 url:
   party-service: http://localhost:8083/
-  election-service: http://localhost:8081/
+  candidate-service: http://localhost:8082/
+  election-service: http://localhost:8084/
+  vote-service: http://localhost:8084/
+  voter-service: http://localhost:8081/

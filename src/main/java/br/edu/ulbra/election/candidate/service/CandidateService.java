@@ -128,28 +128,23 @@ public class CandidateService {
             throw new GenericOutputException("Party id is required");
         }
         if (candidateInput.getName().indexOf(" ") == -1) {
-            throw new GenericOutputException("error");
+            throw new GenericOutputException("Last name is required");
         }
 
         if (candidateInput.getName().length() < 5) {
-            throw new GenericOutputException("error");
+            throw new GenericOutputException("min length 5");
         }
 
         ElectionOutput electionOutput = electionClientService.getById(candidateInput.getElectionId());
         PartyOutput partyOutput = partyClientService.getById(candidateInput.getPartyId());
 
         if (electionOutput == null) {
-            throw new GenericOutputException("error Election");
+            throw new GenericOutputException("Election not found");
         }
 
         if (partyOutput == null) {
-            throw new GenericOutputException("error Party");
+            throw new GenericOutputException("Party not found");
         }
     }
-//
-//    private void valideNewInput(CandidateInput candidateInput){
-//        PartyOutput party = new PartyOutput();
-//    }
-
 }
 
