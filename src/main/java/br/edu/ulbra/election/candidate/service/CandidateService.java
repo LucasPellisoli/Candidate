@@ -128,11 +128,11 @@ public class CandidateService {
             throw new GenericOutputException("Party id is required");
         }
         if (candidateInput.getName().indexOf(" ") == -1) {
-            throw new GenericOutputException("Last name is required");
+            throw new GenericOutputException("Is mandatory to have first and last name");
         }
 
         if (candidateInput.getName().length() < 5) {
-            throw new GenericOutputException("min length 5");
+            throw new GenericOutputException("Minimal of letters 5");
         }
 
         ElectionOutput electionOutput = electionClientService.getById(candidateInput.getElectionId());
